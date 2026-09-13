@@ -5,10 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Generator Perangkat Ajar Kurikulum Merdeka</title>
   <!-- Tailwind CSS CDN -->
+  <!-- Library Converter Markdown ke HTML -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Family Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Penataan Tampilan Dokumen Hasil */
+.doc-preview h1 { font-size: 1.5rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #1e293b; border-bottom: 2px solid #cbd5e1; padding-bottom: 0.25rem; }
+.doc-preview h2 { font-size: 1.25rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #1e293b; text-transform: uppercase; }
+.doc-preview h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.35rem; color: #334155; }
+.doc-preview h4 { font-size: 0.95rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.25rem; color: #475569; }
+.doc-preview p { margin-bottom: 0.5rem; line-height: 1.6; color: #334155; font-size: 0.9rem; }
+.doc-preview ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.75rem; font-size: 0.9rem; }
+.doc-preview ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.75rem; font-size: 0.9rem; }
+.doc-preview hr { border: 0; border-top: 1px solid #cbd5e1; margin: 1rem 0; }
+
+/* Styling Tabel Otomatis Rapi */
+.doc-preview table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; margin-bottom: 1rem; font-size: 0.85rem; }
+.doc-preview th, .doc-preview td { border: 1px solid #94a3b8; padding: 0.5rem 0.75rem; text-align: left; vertical-align: top; }
+.doc-preview th { background-color: #f1f5f9; font-weight: 700; color: #0f172a; }
+.doc-preview tr:nth-child(even) { background-color: #f8fafc; }
     body { font-family: 'Inter', sans-serif; }
     
     /* Format Cetak Kertas A4 */
@@ -511,25 +528,10 @@ PETUNJUK FORMAT HALAMAN:
         document.getElementById('loading-state').classList.add('hidden');
       }
     }
-
-    // Parser Sederhana Markdown ke HTML Teks
-    function parseMarkdown(md) {
-      let html = md
-        // Headings
-        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        // Bold & Italic
-        .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-        // List Item
-        .replace(/^\* (.*$)/gim, '<li>$1</li>')
-        .replace(/^- (.*$)/gim, '<li>$1</li>')
-        // Line Breaks
-        .replace(/\n\n/gim, '</p><p>');
-
-      return `<div><p>${html}</p></div>`;
-    }
+    // Menggunakan library Marked untuk konversi Markdown ke HTML yang presisi
+function parseMarkdown(md) {
+  return marked.parse(md);
+}
   </script>
 </body>
 </html>
