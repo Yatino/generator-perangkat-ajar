@@ -1,669 +1,535 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Generator Perangkat Ajar - Siap Cetak</title>
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Marked.js for rendering Markdown output from AI -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Generator Perangkat Ajar Kurikulum Merdeka</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Family Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
     
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        
-        /* Markdown & Document Print Styles */
-        .prose h1 { font-size: 1.5rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 1rem; color: #0f172a; text-align: center; text-transform: uppercase; }
-        .prose h2 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3rem;}
-        .prose h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #334155; }
-        .prose p { margin-bottom: 0.75rem; line-height: 1.6; color: #334155; text-align: justify; }
-        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #334155;}
-        .prose ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; color: #334155;}
-        .prose li { margin-bottom: 0.25rem; }
-        .prose strong { font-weight: 600; color: #0f172a; }
-        .prose table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem; }
-        .prose th, .prose td { border: 1px solid #94a3b8; padding: 0.6rem 0.75rem; text-align: left; vertical-align: top; }
-        .prose th { background-color: #f1f5f9; font-weight: 600; color: #0f172a; }
+    /* Format Cetak Kertas A4 */
+    @media print {
+      body * { visibility: hidden; }
+      #print-area, #print-area * { visibility: visible; }
+      #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      .no-print { display: none !important; }
+    }
 
-        /* Custom Toast Notification */
-        #toastNotification {
-            transition: all 0.3s ease-in-out;
-        }
-
-        /* Print styles */
-        @media print {
-            body { background: white; color: black; }
-            #appSidebar, #header-bar, #action-buttons, #sidebar, #mobileOverlay { display: none !important; }
-            #main-content { margin: 0; padding: 0; width: 100%; height: auto; overflow: visible; }
-            #result-container { box-shadow: none; border: none; padding: 0; width: 100%; height: auto; overflow: visible; }
-            #outputArea { padding: 0; margin: 0; overflow: visible; }
-            .prose { max-width: 100% !important; font-size: 11pt; line-height: 1.4; }
-            .prose table { font-size: 10pt; page-break-inside: auto; }
-            .prose tr { page-break-inside: avoid; page-break-after: auto; }
-            .prose h1, .prose h2, .prose h3 { page-break-after: avoid; }
-        }
-        
-        /* Loader Animation */
-        .loader {
-            border-top-color: #0ea5e9;
-            -webkit-animation: spinner 1.5s linear infinite;
-            animation: spinner 1.5s linear infinite;
-        }
-        @keyframes spinner {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    /* Penataan Gaya Dokumen Hasil */
+    .doc-preview h1 { font-size: 1.5rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.25rem; }
+    .doc-preview h2 { font-size: 1.25rem; font-weight: 600; margin-top: 0.85rem; margin-bottom: 0.5rem; color: #334155; }
+    .doc-preview h3 { font-size: 1.1rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.25rem; color: #475569; }
+    .doc-preview p { margin-bottom: 0.5rem; line-height: 1.6; color: #334155; }
+    .doc-preview ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.5rem; }
+    .doc-preview ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.5rem; }
+    .doc-preview table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; margin-bottom: 0.75rem; font-size: 0.9rem; }
+    .doc-preview th, .doc-preview td { border: 1px solid #cbd5e1; padding: 0.5rem; text-align: left; }
+    .doc-preview th { background-color: #f8fafc; font-weight: 600; }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 h-screen overflow-hidden flex">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- Mobile Overlay -->
-    <div id="mobileOverlay" class="fixed inset-0 bg-slate-900/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
-
-    <!-- Sidebar Navigation -->
-    <aside id="appSidebar" class="w-72 bg-slate-900 text-slate-300 flex flex-col h-full absolute lg:relative z-30 transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
-        <div class="p-5 border-b border-slate-800 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="bg-brand-500 text-white p-2.5 rounded-xl shadow-md">
-                    <i class="fa-solid fa-graduation-cap text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold text-white leading-tight">GuruGen AI</h1>
-                    <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-0.5">Perangkat Ajar Siap Cetak</p>
-                </div>
-            </div>
-            <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white">
-                <i class="fa-solid fa-times text-xl"></i>
-            </button>
+  <!-- TOP HEADER / NAVBAR -->
+  <header class="bg-indigo-700 text-white shadow-md no-print sticky top-0 z-30">
+    <div class="px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="p-2 bg-indigo-800 rounded-lg">
+          <svg class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
         </div>
-
-        <!-- Menu Navigation -->
-        <div class="flex-grow overflow-y-auto py-4">
-            <div class="px-4 mb-2">
-                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-2">Menu Perangkat Ajar</p>
-                <nav class="space-y-1" id="navMenu">
-                    <!-- Menu items generated by JS -->
-                </nav>
-            </div>
+        <div>
+          <h1 class="text-lg font-bold leading-tight">Perangkat Ajar AI</h1>
+          <p class="text-xs text-indigo-200">Generator Kurikulum Merdeka Otomatis Siap Cetak</p>
         </div>
+      </div>
 
-        <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-            &copy; 2026 AI GuruGen<br>Kurikulum Merdeka Indonesia
-        </div>
+      <!-- Header Action Buttons -->
+      <div class="flex items-center gap-2">
+        <!-- Tombol API Key -->
+        <button onclick="openApiKeyModal()" class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-indigo-800 hover:bg-indigo-900 rounded-lg border border-indigo-500 shadow-sm transition-all">
+          <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+          </svg>
+          <span>API Key</span>
+          <span id="api-key-badge" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-500 text-white">Belum Diset</span>
+        </button>
+
+        <!-- Tombol Cetak Dokumen -->
+        <button onclick="window.print()" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+          </svg>
+          <span>Cetak / PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER WITH SIDEBAR -->
+  <div class="flex-1 flex overflow-hidden">
+    
+    <!-- SIDEBAR NAVIGASI MENU DOKUMEN -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col no-print shrink-0">
+      <div class="p-4 border-b border-gray-100 bg-gray-50">
+        <h2 class="text-xs font-bold uppercase text-gray-500 tracking-wider">Pilih Jenis Dokumen</h2>
+      </div>
+      <nav class="flex-1 p-2 space-y-1 overflow-y-auto" id="menu-nav">
+        <button onclick="selectDocType('Modul Ajar / RPP')" class="nav-btn active w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg text-left transition-colors bg-indigo-50 text-indigo-700">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          Modul Ajar / RPP
+        </button>
+        <button onclick="selectDocType('Capaian & Alur Tujuan Pembelajaran (CP & ATP)')" class="nav-btn w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          CP & ATP
+        </button>
+        <button onclick="selectDocType('Program Tahunan (Prota)')" class="nav-btn w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Program Tahunan (Prota)
+        </button>
+        <button onclick="selectDocType('Program Semester (Promes)')" class="nav-btn w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          Program Semester (Promes)
+        </button>
+        <button onclick="selectDocType('Lembar Kerja Peserta Didik (LKPD)')" class="nav-btn w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          LKPD Siswa
+        </button>
+        <button onclick="selectDocType('Instrumen & Rubrik Asesmen')" class="nav-btn w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Rubrik & Asesmen
+        </button>
+        <button onclick="selectDocType('Modul Projek P5 (Pancasila)')" class="nav-btn w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+          Modul Projek P5
+        </button>
+      </nav>
     </aside>
 
-    <!-- Main Content Wrapper -->
-    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        
-        <!-- Header Bar -->
-        <header id="header-bar" class="bg-white shadow-sm border-b border-slate-200 z-10 flex-shrink-0">
-            <div class="px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <button onclick="toggleSidebar()" class="lg:hidden text-slate-500 hover:text-slate-700">
-                        <i class="fa-solid fa-bars text-xl"></i>
-                    </button>
-                    <div>
-                        <h2 id="activeMenuTitle" class="text-base sm:text-lg font-bold text-slate-800">Modul Ajar (RPP)</h2>
-                        <p class="text-xs text-slate-500 hidden sm:block">Lengkapi identitas formal dan parameter materi di bawah.</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="bg-brand-50 text-brand-700 border border-brand-200 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5">
-                        <i class="fa-solid fa-shield-halved text-brand-500"></i> Format Siap Cetak
-                    </span>
-                </div>
+    <!-- CONTENT AREA -->
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden">
+      
+      <!-- FORM PARAMETER (Kiri / 5 Kolom) -->
+      <section class="w-full md:w-5/12 bg-white border-r border-gray-200 flex flex-col overflow-y-auto no-print">
+        <div class="p-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+          <h2 class="text-sm font-bold text-gray-800" id="current-doc-title">Pengaturan Modul Ajar / RPP</h2>
+        </div>
+
+        <!-- FORM TABS -->
+        <div class="flex border-b border-gray-200 bg-gray-50 text-xs font-semibold">
+          <button id="tab-btn-identitas" onclick="switchTab('identitas')" class="flex-1 py-2.5 px-3 border-b-2 border-indigo-600 text-indigo-600 font-bold bg-white">
+            1. Identitas Guru & Sekolah
+          </button>
+          <button id="tab-btn-konteks" onclick="switchTab('konteks')" class="flex-1 py-2.5 px-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+            2. Konteks Materi
+          </button>
+        </div>
+
+        <form id="generator-form" onsubmit="handleFormSubmit(event)" class="p-4 space-y-4 flex-1">
+          
+          <!-- TAB 1: IDENTITAS GURU & SEKOLAH -->
+          <div id="tab-identitas" class="space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Satuan Pendidikan (Sekolah)</label>
+              <input type="text" id="school" value="SD Negeri 1 Tirtomoyo" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500" required>
             </div>
-        </header>
-
-        <!-- Main Workspace -->
-        <main id="main-content" class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
-            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8 h-full max-w-[1600px] mx-auto">
-                
-                <!-- Form Input Column -->
-                <div id="sidebar" class="xl:col-span-4 flex flex-col">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 flex flex-col h-full overflow-y-auto">
-                        
-                        <!-- Tab Switcher for Form Sections -->
-                        <div class="flex border-b border-slate-200 mb-5">
-                            <button type="button" id="tabBtnIdentity" onclick="switchFormTab('identity')" 
-                                class="flex-1 py-2 text-xs font-bold border-b-2 border-brand-600 text-brand-600 flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-id-card"></i> Identitas Guru
-                            </button>
-                            <button type="button" id="tabBtnContext" onclick="switchFormTab('context')" 
-                                class="flex-1 py-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-book text-xs"></i> Konteks Materi
-                            </button>
-                        </div>
-
-                        <form id="generatorForm" class="space-y-4 flex-grow flex flex-col justify-between">
-                            
-                            <!-- TAB 1: IDENTITAS GURU & SEKOLAH -->
-                            <div id="tabIdentityContent" class="space-y-3.5">
-                                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600 mb-2">
-                                    <i class="fa-solid fa-circle-info text-brand-500 mr-1"></i> Data di bawah akan digunakan untuk Kop Surat & Format Tanda Tangan Pengesahan.
-                                </div>
-
-                                <!-- Satuan Pendidikan / Sekolah -->
-                                <div>
-                                    <label for="schoolName" class="block text-xs font-semibold text-slate-700 mb-1">Satuan Pendidikan (Sekolah) <span class="text-red-500">*</span></label>
-                                    <input type="text" id="schoolName" name="schoolName" required placeholder="Contoh: SD Negeri 1 Kebumen" 
-                                        class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs">
-                                </div>
-
-                                <!-- Nama Guru & NIP -->
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div>
-                                        <label for="teacherName" class="block text-xs font-semibold text-slate-700 mb-1">Nama Guru <span class="text-red-500">*</span></label>
-                                        <input type="text" id="teacherName" name="teacherName" required placeholder="Ahmad Fauzi, S.Pd." 
-                                            class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs">
-                                    </div>
-                                    <div>
-                                        <label for="teacherNip" class="block text-xs font-semibold text-slate-700 mb-1">NIP Guru</label>
-                                        <input type="text" id="teacherNip" name="teacherNip" placeholder="19850101 201001 1 001" 
-                                            class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs">
-                                    </div>
-                                </div>
-
-                                <!-- Nama Kepala Sekolah & NIP -->
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div>
-                                        <label for="principalName" class="block text-xs font-semibold text-slate-700 mb-1">Kepala Sekolah <span class="text-red-500">*</span></label>
-                                        <input type="text" id="principalName" name="principalName" required placeholder="Drs. Hj. Siti Aminah, M.Pd." 
-                                            class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs">
-                                    </div>
-                                    <div>
-                                        <label for="principalNip" class="block text-xs font-semibold text-slate-700 mb-1">NIP Kepala Sekolah</label>
-                                        <input type="text" id="principalNip" name="principalNip" placeholder="19750312 199903 2 002" 
-                                            class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs">
-                                    </div>
-                                </div>
-
-                                <!-- Tahun Ajaran & Semester -->
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label for="academicYear" class="block text-xs font-semibold text-slate-700 mb-1">Tahun Ajaran <span class="text-red-500">*</span></label>
-                                        <input type="text" id="academicYear" name="academicYear" required placeholder="2026/2027" value="2026/2027"
-                                            class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs">
-                                    </div>
-                                    <div>
-                                        <label for="semester" class="block text-xs font-semibold text-slate-700 mb-1">Semester <span class="text-red-500">*</span></label>
-                                        <select id="semester" name="semester" required 
-                                            class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs bg-white">
-                                            <option value="Ganjil (1)">Ganjil (1)</option>
-                                            <option value="Genap (2)">Genap (2)</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Kota / Tempat Penetapan -->
-                                <div>
-                                    <label for="locationDate" class="block text-xs font-semibold text-slate-700 mb-1">Kota & Tanggal Pengesahan</label>
-                                    <input type="text" id="locationDate" name="locationDate" placeholder="Contoh: Kebumen, 14 Juli 2026" 
-                                        class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs">
-                                </div>
-                            </div>
-
-                            <!-- TAB 2: KONTEKS PEMBELAJARAN (Hidden initially or toggleable) -->
-                            <div id="tabContextContent" class="space-y-3.5 hidden">
-                                <!-- Mata Pelajaran -->
-                                <div>
-                                    <label for="subject" class="block text-xs font-semibold text-slate-700 mb-1">Mata Pelajaran <span class="text-red-500">*</span></label>
-                                    <input type="text" id="subject" name="subject" required placeholder="Contoh: IPAS, Bahasa Indonesia, Matematika" 
-                                        class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs">
-                                </div>
-
-                                <!-- Fase & Kelas -->
-                                <div>
-                                    <label for="fase" class="block text-xs font-semibold text-slate-700 mb-1">Fase / Kelas <span class="text-red-500">*</span></label>
-                                    <select id="fase" name="fase" required 
-                                        class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs bg-white">
-                                        <option value="" disabled selected>Pilih Fase & Kelas</option>
-                                        <option value="Fase A (Kelas 1 SD)">Fase A (Kelas 1 SD)</option>
-                                        <option value="Fase A (Kelas 2 SD)">Fase A (Kelas 2 SD)</option>
-                                        <option value="Fase B (Kelas 3 SD)">Fase B (Kelas 3 SD)</option>
-                                        <option value="Fase B (Kelas 4 SD)">Fase B (Kelas 4 SD)</option>
-                                        <option value="Fase C (Kelas 5 SD)">Fase C (Kelas 5 SD)</option>
-                                        <option value="Fase C (Kelas 6 SD)">Fase C (Kelas 6 SD)</option>
-                                        <option value="Fase D (Kelas 7 SMP)">Fase D (Kelas 7 SMP)</option>
-                                        <option value="Fase D (Kelas 8 SMP)">Fase D (Kelas 8 SMP)</option>
-                                        <option value="Fase D (Kelas 9 SMP)">Fase D (Kelas 9 SMP)</option>
-                                        <option value="Fase E (Kelas 10 SMA/SMK)">Fase E (Kelas 10 SMA/SMK)</option>
-                                        <option value="Fase F (Kelas 11 SMA/SMK)">Fase F (Kelas 11 SMA/SMK)</option>
-                                        <option value="Fase F (Kelas 12 SMA/SMK)">Fase F (Kelas 12 SMA/SMK)</option>
-                                    </select>
-                                </div>
-
-                                <!-- Materi Pokok -->
-                                <div>
-                                    <label for="topic" class="block text-xs font-semibold text-slate-700 mb-1">Topik / Lingkup Materi <span class="text-red-500">*</span></label>
-                                    <textarea id="topic" name="topic" required rows="2" placeholder="Contoh: Ekosistem & Rantai Makanan, Bangun Ruang, Teks Prosedur" 
-                                        class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs resize-none"></textarea>
-                                </div>
-
-                                <!-- Alokasi Waktu -->
-                                <div>
-                                    <label for="duration" class="block text-xs font-semibold text-slate-700 mb-1">Alokasi Waktu</label>
-                                    <input type="text" id="duration" name="duration" placeholder="Contoh: 2 x 45 Menit (1 Pertemuan)" 
-                                        class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs">
-                                </div>
-
-                                <!-- Catatan Tambahan -->
-                                <div>
-                                    <label for="extraNotes" class="block text-xs font-semibold text-slate-700 mb-1">Instruksi Khusus (Opsional)</label>
-                                    <input type="text" id="extraNotes" name="extraNotes" placeholder="Misal: Model PBL, fokus pada peserta didik diferensiasi visual" 
-                                        class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-xs">
-                                </div>
-                            </div>
-
-                            <!-- Submit Action Button -->
-                            <div class="pt-4 mt-auto">
-                                <button type="submit" id="generateBtn" 
-                                    class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                    <span id="btnText">Generate Modul Ajar</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Output Display Column -->
-                <div class="xl:col-span-8 flex flex-col h-[650px] xl:h-auto">
-                    <div id="result-container" class="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full relative overflow-hidden">
-                        
-                        <!-- Floating Action Bar -->
-                        <div id="action-buttons" class="hidden absolute top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 py-3 flex justify-between items-center z-10 rounded-t-2xl shadow-sm">
-                            <div class="flex items-center gap-2">
-                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span class="text-xs font-bold text-slate-700 uppercase tracking-wide" id="outputDocTitle">Hasil Generasi</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="copyContent()" class="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 rounded-lg hover:bg-brand-50 hover:text-brand-600 hover:border-brand-200 transition-colors flex items-center gap-1.5 shadow-sm">
-                                    <i class="fa-regular fa-copy"></i> Salin Teks
-                                </button>
-                                <button onclick="printContent()" class="px-4 py-1.5 text-xs font-semibold text-white bg-brand-600 border border-brand-700 rounded-lg hover:bg-brand-700 transition-colors flex items-center gap-1.5 shadow-sm">
-                                    <i class="fa-solid fa-print"></i> Cetak / PDF
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Output Document Workspace -->
-                        <div id="outputArea" class="p-6 md:p-10 pt-16 flex-grow overflow-y-auto prose prose-slate max-w-none w-full bg-white relative z-0">
-                            <!-- Empty State -->
-                            <div id="emptyState" class="h-full flex flex-col items-center justify-center text-center text-slate-400 py-16">
-                                <div class="bg-slate-50 p-6 rounded-2xl mb-4 ring-8 ring-slate-50/50 border border-slate-100">
-                                    <i id="emptyStateIcon" class="fa-solid fa-book-open text-5xl text-slate-300"></i>
-                                </div>
-                                <h3 class="text-base font-bold text-slate-700 mb-1">Dokumen Perangkat Ajar Siap Cetak</h3>
-                                <p class="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-                                    Isi <strong>Identitas Guru & Sekolah</strong> serta <strong>Konteks Pembelajaran</strong>, lalu klik tombol Generate di sebelah kiri.
-                                </p>
-                            </div>
-
-                            <!-- Loading State -->
-                            <div id="loadingState" class="hidden h-full flex flex-col items-center justify-center text-center py-16">
-                                <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-200 h-12 w-12 mb-4"></div>
-                                <h3 class="text-base font-bold text-slate-700">AI Sedang Menyusun Dokumen...</h3>
-                                <p class="text-xs text-slate-500 max-w-sm mx-auto mt-2 leading-relaxed">
-                                    Menyusun Kop Identitas Formal, konten Kurikulum Merdeka, dan format Lembar Pengesahan (sekitar 10-15 detik).
-                                </p>
-                            </div>
-
-                            <!-- Rendered Output -->
-                            <div id="resultContent" class="hidden pb-12"></div>
-                        </div>
-                    </div>
-                </div>
-
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Guru</label>
+                <input type="text" id="teacher-name" value="Yatino, S.Pd.I." class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500" required>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">NIP Guru</label>
+                <input type="text" id="teacher-nip" value="19880512 201403 1 002" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500">
+              </div>
             </div>
-        </main>
-    </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Kepala Sekolah</label>
+                <input type="text" id="principal-name" value="Ahmad Dahlan, M.Pd." class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500" required>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">NIP Kepala Sekolah</label>
+                <input type="text" id="principal-nip" value="19750210 200003 1 001" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Tahun Ajaran</label>
+                <input type="text" id="academic-year" value="2026/2027" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Semester</label>
+                <select id="semester" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500">
+                  <option value="1 (Ganjil)">1 (Ganjil)</option>
+                  <option value="2 (Genap)">2 (Genap)</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Tempat & Tanggal Pengesahan</label>
+              <input type="text" id="legal-date" value="Kebumen, 14 September 2026" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500">
+            </div>
+          </div>
 
-    <!-- Notification Toast -->
-    <div id="toastNotification" class="fixed bottom-5 right-5 bg-slate-800 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs flex items-center gap-2 transform translate-y-20 opacity-0 z-50">
-        <i id="toastIcon" class="fa-solid fa-check text-emerald-400"></i>
-        <span id="toastMessage">Pesan Notifikasi</span>
-    </div>
+          <!-- TAB 2: KONTEKS MATERI -->
+          <div id="tab-konteks" class="space-y-3 hidden">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Mata Pelajaran</label>
+              <input type="text" id="subject" value="Matematika" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500" required>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Fase / Kelas</label>
+                <input type="text" id="grade-phase" value="Fase C / Kelas 6" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500" required>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Alokasi Waktu</label>
+                <input type="text" id="time-alloc" value="2 x 35 Menit (1 Pertemuan)" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Topik / Elemen Materi Utama</label>
+              <textarea id="topic" rows="3" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500" required placeholder="Contoh: Operasi Hitung Pembagian Pecahan Biasa dan Campuran">Operasi Hitung Pembagian Pecahan</textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Catatan Tambahan / Model Pembelajaran</label>
+              <textarea id="custom-notes" rows="2" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500" placeholder="Contoh: Pendekatan PBL, siswa menggunakan alat peraga sederhana.">Model Problem Based Learning (PBL) interaktif dengan media visual.</textarea>
+            </div>
+          </div>
 
-    <script>
-        const menuConfig = {
-            'modul_ajar': { 
-                title: 'Modul Ajar (RPP)', 
-                fullTitle: 'Modul Ajar / RPP Kurikulum Merdeka',
-                icon: 'fa-book-open', 
-                prompt: 'Buatkan Modul Ajar (RPP) Kurikulum Merdeka yang lengkap dan terstruktur. Komponen wajib: Identitas Modul, Kompetensi Awal, Profil Pelajar Pancasila, Sarana & Prasarana, Target Peserta Didik, Model Pembelajaran, Tujuan Pembelajaran, Pemahaman Bermakna, Pertanyaan Pemantik, Kegiatan Pembelajaran (Pendahuluan, Inti dengan sintaks model pembelajaran, Penutup), Asesmen, dan Refleksi Guru & Peserta Didik.'
-            },
-            'cpatp': { 
-                title: 'CP & ATP', 
-                fullTitle: 'Capaian & Alur Tujuan Pembelajaran',
-                icon: 'fa-route', 
-                prompt: 'Buatkan rincian Capaian Pembelajaran (CP) dan Alur Tujuan Pembelajaran (ATP) yang runtut dari mudah ke kompleks. Sajikan dalam format Tabel Matriks (No, Elemen CP, Capaian Pembelajaran, Tujuan Pembelajaran, Alokasi Waktu, Indikator Ketercapaian).'
-            },
-            'prota': { 
-                title: 'Program Tahunan', 
-                fullTitle: 'Program Tahunan (Prota)',
-                icon: 'fa-calendar-days', 
-                prompt: 'Buatkan Program Tahunan (Prota) Kurikulum Merdeka. Sajikan dalam format Tabel Rapi berisi: No, Semester, No TP/Materi Pokok, Tujuan Pembelajaran, Alokasi Waktu (JP), dan Keterangan.'
-            },
-            'promes': { 
-                title: 'Program Semester', 
-                fullTitle: 'Program Semester (Promes)',
-                icon: 'fa-calendar-week', 
-                prompt: 'Buatkan Program Semester (Promes) Kurikulum Merdeka. Sajikan dalam format Tabel Matriks yang membagi distribusi Alokasi Waktu per Tujuan Pembelajaran ke dalam bulan dan minggu efektif selama 1 Semester.'
-            },
-            'lkpd': { 
-                title: 'LKPD Interaktif', 
-                fullTitle: 'Lembar Kerja Peserta Didik (LKPD)',
-                icon: 'fa-file-signature', 
-                prompt: 'Buatkan Lembar Kerja Peserta Didik (LKPD) yang menarik. Sertakan Identitas Kelompok/Siswa, Judul Kegiatan, Tujuan Pembelajaran, Alat/Bahan, Petunjuk Kerja, Langkah-Langkah Aktivitas Eksplorasi (HOTS), Pertanyaan Diskusi, dan Kolom Kesimpulan.'
-            },
-            'asesmen': { 
-                title: 'Asesmen & Rubrik', 
-                fullTitle: 'Asesmen Formatif, Sumatif & Rubrik',
-                icon: 'fa-clipboard-check', 
-                prompt: 'Buatkan instrumen Penilaian (Asesmen) lengkap meliputi: 1) Asesmen Diagnosis/Awal, 2) Asesmen Formatif (Proses), 3) Asesmen Sumatif (Kisi-kisi & Contoh Soal), dan 4) Rubrik Penilaian Kualitatif (Skala: Perlu Bimbingan, Cukup, Baik, Sangat Baik).'
-            },
-            'materi': { 
-                title: 'Bahan Ajar / Literasi', 
-                fullTitle: 'Bahan Ajar & Ringkasan Materi',
-                icon: 'fa-file-lines', 
-                prompt: 'Buatkan Bahan Ajar (Bahan Bacaan Guru dan Peserta Didik) yang komprehensif, menarik, berstruktur sub-bab, dilengkapi contoh kontekstual, peta konsep sederhana, dan glosarium istilah penting.'
-            }
-        };
+          <!-- Tombol Generate -->
+          <div class="pt-2 border-t border-gray-100">
+            <button type="submit" id="btn-generate" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span>Buat Dokumen Sekarang</span>
+            </button>
+          </div>
 
-        let currentActiveMenu = 'modul_ajar';
+        </form>
+      </section>
 
-        // DOM Elements
-        const navMenuContainer = document.getElementById('navMenu');
-        const activeMenuTitle = document.getElementById('activeMenuTitle');
-        const btnText = document.getElementById('btnText');
-        const emptyStateIcon = document.getElementById('emptyStateIcon');
-        const outputDocTitle = document.getElementById('outputDocTitle');
-        const appSidebar = document.getElementById('appSidebar');
-        const mobileOverlay = document.getElementById('mobileOverlay');
+      <!-- HASIL / DOCUMENT PREVIEW (Kanan / 7 Kolom) -->
+      <section class="w-full md:w-7/12 bg-gray-200 p-4 md:p-6 overflow-y-auto flex-1">
         
-        const form = document.getElementById('generatorForm');
-        const generateBtn = document.getElementById('generateBtn');
-        const emptyState = document.getElementById('emptyState');
-        const loadingState = document.getElementById('loadingState');
-        const resultContent = document.getElementById('resultContent');
-        const actionButtons = document.getElementById('action-buttons');
-        let rawMarkdownResponse = '';
+        <div id="print-area" class="bg-white rounded-xl shadow-lg border border-gray-200 p-8 min-h-full max-w-3xl mx-auto flex flex-col justify-between">
+          
+          <!-- Wadah Konten Dokumen Utama -->
+          <div>
+            <!-- Status Belum Dibuat -->
+            <div id="placeholder-state" class="text-center py-20 text-gray-400">
+              <svg class="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              <p class="text-sm font-medium">Dokumen Belum Dibuat</p>
+              <p class="text-xs text-gray-400 mt-1">Isi identitas & parameter materi di sebelah kiri, lalu klik tombol **Buat Dokumen**.</p>
+            </div>
 
-        function renderMenu() {
-            navMenuContainer.innerHTML = '';
-            for (const [key, menu] of Object.entries(menuConfig)) {
-                const isActive = key === currentActiveMenu;
-                const activeClasses = isActive 
-                    ? 'bg-brand-600 text-white shadow-sm border-transparent' 
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-white border-transparent';
-                
-                const menuItem = `
-                    <a href="#" onclick="switchMenu('${key}', event)" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 border border-transparent ${activeClasses}">
-                        <div class="w-5 flex justify-center"><i class="fa-solid ${menu.icon} ${isActive ? 'text-white' : 'text-slate-400'}"></i></div>
-                        <span class="font-semibold text-xs">${menu.title}</span>
-                    </a>
-                `;
-                navMenuContainer.innerHTML += menuItem;
-            }
+            <!-- Status Loading Spin -->
+            <div id="loading-state" class="hidden text-center py-20 text-indigo-600">
+              <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-600 border-t-transparent mb-3"></div>
+              <p class="text-sm font-semibold">Sedang Menyusun Perangkat Ajar...</p>
+              <p class="text-xs text-gray-500 mt-1">Menggunakan AI Gemini 2.0 Flash untuk memproses konten.</p>
+            </div>
+
+            <!-- Area Hasil Teks Dokumen -->
+            <div id="doc-output" class="doc-preview hidden"></div>
+          </div>
+
+          <!-- Lembar Pengesahan (Hanya muncul jika dokumen berhasil di-generate) -->
+          <div id="signature-block" class="hidden mt-12 pt-6 border-t border-gray-200">
+            <div class="flex justify-between text-xs text-gray-800 leading-relaxed">
+              <div class="text-center w-5/12">
+                <p>Mengetahui,</p>
+                <p class="font-semibold">Kepala Sekolah</p>
+                <div class="h-20"></div>
+                <p class="font-bold underline" id="sig-principal-name">-</p>
+                <p>NIP. <span id="sig-principal-nip">-</span></p>
+              </div>
+
+              <div class="text-center w-5/12">
+                <p id="sig-legal-date">Kebumen, 14 September 2026</p>
+                <p class="font-semibold">Guru Mata Pelajaran / Kelas</p>
+                <div class="h-20"></div>
+                <p class="font-bold underline" id="sig-teacher-name">-</p>
+                <p>NIP. <span id="sig-teacher-nip">-</span></p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL PENGATURAN API KEY -->
+  <div id="api-key-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="relative bg-white rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4 border border-gray-100">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+        <div class="flex items-center gap-2">
+          <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-bold text-gray-800">Pengaturan API Key Gemini</h3>
+        </div>
+        <button onclick="closeApiKeyModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <p class="text-xs text-gray-600 leading-relaxed">
+          Masukkan <strong>Gemini API Key</strong> Anda. Kunci ini disimpan secara aman di browser lokal Anda (<code>localStorage</code>) agar aplikasi tetap berfungsi di GitHub Pages tanpa terblokir.
+        </p>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">API Key</label>
+          <input type="password" id="input-api-key" placeholder="AIzaSy..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="bg-blue-50 border border-blue-100 rounded-lg p-2.5 text-[11px] text-blue-800">
+          Belum punya API Key? Dapatkan gratis di 
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" class="font-bold underline text-blue-600">Google AI Studio</a>.
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+        <button onclick="clearApiKey()" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded-md">Hapus Key</button>
+        <div class="flex gap-2">
+          <button onclick="closeApiKeyModal()" class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-md">Batal</button>
+          <button onclick="saveApiKey()" class="px-4 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-md">Simpan Key</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    const STORAGE_KEY = 'gemini_api_key';
+    let selectedDocType = 'Modul Ajar / RPP';
+
+    // Inisialisasi Aplikasi Saat Memuat Halaman
+    document.addEventListener('DOMContentLoaded', () => {
+      updateApiKeyUI();
+    });
+
+    // Pindah Tab Form (Identitas vs Konteks)
+    function switchTab(tabName) {
+      const tabIdentitas = document.getElementById('tab-identitas');
+      const tabKonteks = document.getElementById('tab-konteks');
+      const btnIdentitas = document.getElementById('tab-btn-identitas');
+      const btnKonteks = document.getElementById('tab-btn-konteks');
+
+      if (tabName === 'identitas') {
+        tabIdentitas.classList.remove('hidden');
+        tabKonteks.classList.add('hidden');
+        btnIdentitas.className = "flex-1 py-2.5 px-3 border-b-2 border-indigo-600 text-indigo-600 font-bold bg-white";
+        btnKonteks.className = "flex-1 py-2.5 px-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700";
+      } else {
+        tabIdentitas.classList.add('hidden');
+        tabKonteks.classList.remove('hidden');
+        btnKonteks.className = "flex-1 py-2.5 px-3 border-b-2 border-indigo-600 text-indigo-600 font-bold bg-white";
+        btnIdentitas.className = "flex-1 py-2.5 px-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700";
+      }
+    }
+
+    // Pilih Jenis Dokumen dari Sidebar Navigasi
+    function selectDocType(type) {
+      selectedDocType = type;
+      document.getElementById('current-doc-title').textContent = 'Pengaturan ' + type;
+
+      // Update tampilan tombol navigasi aktif
+      const navButtons = document.querySelectorAll('#menu-nav .nav-btn');
+      navButtons.forEach(btn => {
+        if (btn.textContent.trim().includes(type.split(' ')[0])) {
+          btn.className = "nav-btn active w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg text-left transition-colors bg-indigo-50 text-indigo-700 font-semibold";
+        } else {
+          btn.className = "nav-btn w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left transition-colors";
         }
+      });
+    }
 
-        function switchMenu(key, event) {
-            if (event) event.preventDefault();
-            currentActiveMenu = key;
-            const menu = menuConfig[key];
-            
-            renderMenu();
-            
-            activeMenuTitle.innerText = menu.fullTitle;
-            btnText.innerText = `Generate ${menu.title}`;
-            emptyStateIcon.className = `fa-solid ${menu.icon} text-5xl text-slate-300`;
-            outputDocTitle.innerText = `Hasil: ${menu.title}`;
-            
-            if (window.innerWidth < 1024) {
-                toggleSidebar();
-            }
-        }
+    // Pengelolaan Modal API Key
+    function openApiKeyModal() {
+      document.getElementById('input-api-key').value = localStorage.getItem(STORAGE_KEY) || '';
+      document.getElementById('api-key-modal').classList.remove('hidden');
+    }
 
-        function switchFormTab(tab) {
-            const identityTab = document.getElementById('tabIdentityContent');
-            const contextTab = document.getElementById('tabContextContent');
-            const btnIdentity = document.getElementById('tabBtnIdentity');
-            const btnContext = document.getElementById('tabBtnContext');
+    function closeApiKeyModal() {
+      document.getElementById('api-key-modal').classList.add('hidden');
+    }
 
-            if (tab === 'identity') {
-                identityTab.classList.remove('hidden');
-                contextTab.classList.add('hidden');
-                btnIdentity.className = "flex-1 py-2 text-xs font-bold border-b-2 border-brand-600 text-brand-600 flex items-center justify-center gap-1.5";
-                btnContext.className = "flex-1 py-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex items-center justify-center gap-1.5";
-            } else {
-                contextTab.classList.remove('hidden');
-                identityTab.classList.add('hidden');
-                btnContext.className = "flex-1 py-2 text-xs font-bold border-b-2 border-brand-600 text-brand-600 flex items-center justify-center gap-1.5";
-                btnIdentity.className = "flex-1 py-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex items-center justify-center gap-1.5";
-            }
-        }
+    function saveApiKey() {
+      const key = document.getElementById('input-api-key').value.trim();
+      if (!key) {
+        alert('Silakan masukkan API Key yang valid.');
+        return;
+      }
+      localStorage.setItem(STORAGE_KEY, key);
+      updateApiKeyUI();
+      closeApiKeyModal();
+      alert('API Key berhasil disimpan di browser!');
+    }
 
-        function toggleSidebar() {
-            const isClosed = appSidebar.classList.contains('-translate-x-full');
-            if (isClosed) {
-                appSidebar.classList.remove('-translate-x-full');
-                mobileOverlay.classList.remove('hidden');
-            } else {
-                appSidebar.classList.add('-translate-x-full');
-                mobileOverlay.classList.add('hidden');
-            }
-        }
+    function clearApiKey() {
+      if (confirm('Hapus API Key dari penyimpanan browser lokal?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        document.getElementById('input-api-key').value = '';
+        updateApiKeyUI();
+        closeApiKeyModal();
+      }
+    }
 
-        renderMenu();
-        switchMenu(currentActiveMenu);
+    function updateApiKeyUI() {
+      const badge = document.getElementById('api-key-badge');
+      const savedKey = localStorage.getItem(STORAGE_KEY);
+      if (savedKey && savedKey.length > 10) {
+        badge.textContent = 'Aktif';
+        badge.className = 'px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500 text-white';
+      } else {
+        badge.textContent = 'Belum Diset';
+        badge.className = 'px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-500 text-white';
+      }
+    }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    function getApiKey() {
+      const key = localStorage.getItem(STORAGE_KEY);
+      if (!key) {
+        openApiKeyModal();
+        throw new Error('API Key belum diatur.');
+      }
+      return key;
+    }
 
-            // Gather Teacher & School Identity Data
-            const schoolName = document.getElementById('schoolName').value || 'Nama Sekolah Belum Diisi';
-            const teacherName = document.getElementById('teacherName').value || 'Nama Guru Belum Diisi';
-            const teacherNip = document.getElementById('teacherNip').value || '-';
-            const principalName = document.getElementById('principalName').value || 'Nama Kepsek Belum Diisi';
-            const principalNip = document.getElementById('principalNip').value || '-';
-            const academicYear = document.getElementById('academicYear').value || '2026/2027';
-            const semester = document.getElementById('semester').value || 'Ganjil';
-            const locationDate = document.getElementById('locationDate').value || '..............., .................. 2026';
+    // Submit Form & Panggil Gemini API
+    async function handleFormSubmit(e) {
+      e.preventDefault();
 
-            // Gather Learning Context Data
-            const subject = document.getElementById('subject').value;
-            const fase = document.getElementById('fase').value;
-            const topic = document.getElementById('topic').value;
-            const duration = document.getElementById('duration').value || 'Sesuai kebutuhan standar';
-            const extraNotes = document.getElementById('extraNotes').value;
-            
-            const selectedMenuConfig = menuConfig[currentActiveMenu];
+      let apiKey;
+      try {
+        apiKey = getApiKey();
+      } catch (err) {
+        return;
+      }
 
-            // System Instruction for AI
-            const systemPrompt = `Anda adalah seorang ahli Kurikulum Merdeka (Pendidikan Indonesia) dan Guru Penggerak Master. Tugas Anda adalah menyusun Perangkat Ajar yang sangat profesional, terstruktur, praktis, dan LANGSUNG SIAP DICETAK.
+      // Ambil nilai dari input form
+      const school = document.getElementById('school').value;
+      const teacherName = document.getElementById('teacher-name').value;
+      const teacherNip = document.getElementById('teacher-nip').value;
+      const principalName = document.getElementById('principal-name').value;
+      const principalNip = document.getElementById('principal-nip').value;
+      const academicYear = document.getElementById('academic-year').value;
+      const semester = document.getElementById('semester').value;
+      const legalDate = document.getElementById('legal-date').value;
 
-ATURAN WAJIB FORMAT DOKUMEN SIAP CETAK:
-1. PADA BAGIAN AWAL (KOP Halaman Utama):
-   Buatkan Tabel Identitas Formal (Kop Perangkat Ajar) yang rapi di bagian paling atas:
-   - Satuan Pendidikan: ${schoolName}
-   - Mata Pelajaran: ${subject}
-   - Kelas / Fase: ${fase}
-   - Semester / Tahun Ajaran: ${semester} / ${academicYear}
-   - Nama Guru: ${teacherName} (NIP: ${teacherNip})
-   - Alokasi Waktu: ${duration}
+      const subject = document.getElementById('subject').value;
+      const gradePhase = document.getElementById('grade-phase').value;
+      const topic = document.getElementById('topic').value;
+      const timeAlloc = document.getElementById('time-alloc').value;
+      const customNotes = document.getElementById('custom-notes').value;
 
-2. PADA BAGIAN ISI:
-   Sajikan konten perangkat ajar secara komprehensif, terstruktur, rapi menggunakan Markdown Heading, Sub-heading, Poin Bullet, dan Tabel (jika diperlukan).
+      // Update Tampilan State UI
+      document.getElementById('placeholder-state').classList.add('hidden');
+      document.getElementById('doc-output').classList.add('hidden');
+      document.getElementById('signature-block').classList.add('hidden');
+      document.getElementById('loading-state').classList.remove('hidden');
 
-3. PADA BAGIAN PALING AKHIR (LEMBAR PENGESAHAN SIAP CETAK):
-   Wajib sertakan Format Tanda Tangan Pengesahan dalam bentuk Tabel 2 Kolom tanpa border (atau format teks rapi) berisi:
-   - Baris 1: Kota & Tanggal Pengesahan (${locationDate})
-   - Kolom Kiri: "Mengetahui, Kepala Sekolah ${schoolName}" -> nama terang (${principalName}) -> NIP (${principalNip})
-   - Kolom Kanan: "Guru Mata Pelajaran/Kelas" -> nama terang (${teacherName}) -> NIP (${teacherNip})`;
-            
-            let userPrompt = `Tolong buatkan **${selectedMenuConfig.fullTitle}** dengan data spesifik berikut:\n\n`;
-            userPrompt += `### DATA IDENTITAS FORMAL:\n`;
-            userPrompt += `- **Nama Sekolah:** ${schoolName}\n`;
-            userPrompt += `- **Guru Mata Pelajaran:** ${teacherName} (NIP: ${teacherNip})\n`;
-            userPrompt += `- **Kepala Sekolah:** ${principalName} (NIP: ${principalNip})\n`;
-            userPrompt += `- **Tahun Ajaran / Semester:** ${academicYear} / ${semester}\n`;
-            userPrompt += `- **Tanggal Pengesahan:** ${locationDate}\n\n`;
-            
-            userPrompt += `### DATA KONTEKS PEMBELAJARAN:\n`;
-            userPrompt += `- **Mata Pelajaran:** ${subject}\n`;
-            userPrompt += `- **Fase / Kelas:** ${fase}\n`;
-            userPrompt += `- **Topik / Materi Pokok:** ${topic}\n`;
-            userPrompt += `- **Alokasi Waktu:** ${duration}\n`;
-            if (extraNotes) {
-                userPrompt += `- **Instruksi Khusus:** ${extraNotes}\n`;
-            }
-            
-            userPrompt += `\n### INSTRUKSI KHUSUS PERANGKAT AJAR:\n${selectedMenuConfig.prompt}\n`;
+      // Susun Prompt AI
+      const prompt = `
+Anda adalah seorang ahli pengembang kurikulum pendidikan di Indonesia. 
+Buatkan dokumen resmi **${selectedDocType}** Kurikulum Merdeka yang lengkap, mendalam, dan terstruktur rapi.
 
-            updateUIState('loading');
+INFORMASI DOKUMEN:
+- Satuan Pendidikan: ${school}
+- Mata Pelajaran: ${subject}
+- Fase / Kelas: ${gradePhase}
+- Alokasi Waktu: ${timeAlloc}
+- Tahun Ajaran / Semester: ${academicYear} / ${semester}
+- Nama Guru: ${teacherName} (NIP: ${teacherNip})
+- Topik / Materi Utama: ${topic}
+- Catatan Tambahan / Model Pembelajaran: ${customNotes}
 
-            try {
-                const apiKey = ""; // Handled automatically in workspace runtime
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-                
-                const payload = {
-                    contents: [{ parts: [{ text: userPrompt }] }],
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                };
+PETUNJUK FORMAT HALAMAN:
+1. Awali dengan KOP DOKUMEN formal di bagian atas dalam bentuk tabel sederhana atau list identitas.
+2. Buatkan komponen isi dokumen secara mendalam (Tujuan Pembelajaran, Pemahaman Bermakna, Pertanyaan Pemantik, Kegiatan Pembelajaran Awal-Inti-Penutup, dan Asesmen).
+3. Gunakan format Markdown rapi (Gunakan # untuk judul utama, ## untuk sub judul, tabel | | untuk tabel kegiatan/rubrik, dan bullet point).
+4. Jangan tambahkan kolom tanda tangan di teks AI karena sudah ada di template sistem.
+      `;
 
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API Response Error: status ${response.status}`);
-                }
-
-                const result = await response.json();
-                const candidate = result.candidates?.[0];
-
-                if (candidate && candidate.content?.parts?.[0]?.text) {
-                    rawMarkdownResponse = candidate.content.parts[0].text;
-                    const htmlContent = marked.parse(rawMarkdownResponse);
-                    resultContent.innerHTML = htmlContent;
-                    updateUIState('success');
-                } else {
-                    throw new Error("Respon AI tidak valid atau kosong.");
-                }
-
-            } catch (error) {
-                console.error("Generation Error:", error);
-                resultContent.innerHTML = `
-                    <div class="bg-red-50 text-red-600 p-5 rounded-2xl border border-red-200 mt-4 text-xs">
-                        <h4 class="font-bold text-sm mb-1 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Terjadi Kesalahan Server</h4>
-                        <p class="mb-2">Gagal menyusun dokumen. Silakan periksa koneksi internet Anda atau coba tekan tombol Generate kembali.</p>
-                        <span class="font-mono bg-red-100 p-1 rounded text-[10px]">${error.message}</span>
-                    </div>
-                `;
-                updateUIState('error');
-            }
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
         });
 
-        function updateUIState(state) {
-            emptyState.classList.add('hidden');
-            loadingState.classList.add('hidden');
-            resultContent.classList.add('hidden');
-            actionButtons.classList.add('hidden');
-            
-            const btnIcon = `<i class="fa-solid fa-wand-magic-sparkles"></i>`;
-            
-            if (state === 'loading') {
-                generateBtn.disabled = true;
-                generateBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i><span>AI Sedang Bekerja...</span>`;
-                generateBtn.classList.add('opacity-75', 'cursor-wait');
-                loadingState.classList.remove('hidden');
-                
-                if (window.innerWidth < 1280) {
-                    document.getElementById('result-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            } else {
-                generateBtn.disabled = false;
-                generateBtn.innerHTML = `${btnIcon}<span>Generate ${menuConfig[currentActiveMenu].title}</span>`;
-                generateBtn.classList.remove('opacity-75', 'cursor-wait');
-            }
-
-            if (state === 'success') {
-                resultContent.classList.remove('hidden');
-                actionButtons.classList.remove('hidden');
-                document.getElementById('outputArea').scrollTop = 0;
-            } else if (state === 'error') {
-                resultContent.classList.remove('hidden');
-            } else if (state === 'empty') {
-                emptyState.classList.remove('hidden');
-            }
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.error?.message || `Status HTTP: ${response.status}`);
         }
 
-        function showToast(message, isSuccess = true) {
-            const toast = document.getElementById('toastNotification');
-            const toastMsg = document.getElementById('toastMessage');
-            const toastIcon = document.getElementById('toastIcon');
+        const data = await response.json();
+        const rawMarkdown = data.candidates[0].content.parts[0].text;
 
-            toastMsg.innerText = message;
-            if (isSuccess) {
-                toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
-            } else {
-                toastIcon.className = "fa-solid fa-circle-exclamation text-amber-400";
-            }
+        // Render Markdown ke HTML
+        const docOutput = document.getElementById('doc-output');
+        docOutput.innerHTML = parseMarkdown(rawMarkdown);
+        docOutput.classList.remove('hidden');
 
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
+        // Update Data Lembar Pengesahan Signature
+        document.getElementById('sig-principal-name').textContent = principalName;
+        document.getElementById('sig-principal-nip').textContent = principalNip;
+        document.getElementById('sig-teacher-name').textContent = teacherName;
+        document.getElementById('sig-teacher-nip').textContent = teacherNip;
+        document.getElementById('sig-legal-date').textContent = legalDate;
+        document.getElementById('signature-block').classList.remove('hidden');
 
-        function copyContent() {
-            if (!rawMarkdownResponse) return;
-            
-            const textarea = document.createElement('textarea');
-            textarea.value = rawMarkdownResponse;
-            document.body.appendChild(textarea);
-            textarea.select();
-            
-            try {
-                document.execCommand('copy');
-                showToast("Teks dokumen berhasil disalin ke clipboard!");
-            } catch (err) {
-                showToast("Gagal menyalin teks secara otomatis.", false);
-            } finally {
-                document.body.removeChild(textarea);
-            }
-        }
+      } catch (err) {
+        alert("Gagal menyusun dokumen: " + err.message);
+        document.getElementById('placeholder-state').classList.remove('hidden');
+      } finally {
+        document.getElementById('loading-state').classList.add('hidden');
+      }
+    }
 
-        function printContent() {
-            window.print();
-        }
-    </script>
+    // Parser Sederhana Markdown ke HTML Teks
+    function parseMarkdown(md) {
+      let html = md
+        // Headings
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        // Bold & Italic
+        .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+        // List Item
+        .replace(/^\* (.*$)/gim, '<li>$1</li>')
+        .replace(/^- (.*$)/gim, '<li>$1</li>')
+        // Line Breaks
+        .replace(/\n\n/gim, '</p><p>');
+
+      return `<div><p>${html}</p></div>`;
+    }
+  </script>
 </body>
 </html>
