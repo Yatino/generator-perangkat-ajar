@@ -10,52 +10,78 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Family Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    /* Penataan Tampilan Dokumen Hasil */
-.doc-preview h1 { font-size: 1.5rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #1e293b; border-bottom: 2px solid #cbd5e1; padding-bottom: 0.25rem; }
-.doc-preview h2 { font-size: 1.25rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #1e293b; text-transform: uppercase; }
-.doc-preview h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.35rem; color: #334155; }
-.doc-preview h4 { font-size: 0.95rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.25rem; color: #475569; }
-.doc-preview p { margin-bottom: 0.5rem; line-height: 1.6; color: #334155; font-size: 0.9rem; }
-.doc-preview ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.75rem; font-size: 0.9rem; }
-.doc-preview ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.75rem; font-size: 0.9rem; }
-.doc-preview hr { border: 0; border-top: 1px solid #cbd5e1; margin: 1rem 0; }
+ <style>
+  body { font-family: 'Inter', sans-serif; }
 
-/* Styling Tabel Otomatis Rapi */
-.doc-preview table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; margin-bottom: 1rem; font-size: 0.85rem; }
-.doc-preview th, .doc-preview td { border: 1px solid #94a3b8; padding: 0.5rem 0.75rem; text-align: left; vertical-align: top; }
-.doc-preview th { background-color: #f1f5f9; font-weight: 700; color: #0f172a; }
-.doc-preview tr:nth-child(even) { background-color: #f8fafc; }
-    body { font-family: 'Inter', sans-serif; }
-    
-    /* Format Cetak Kertas A4 */
-    @media print {
-      body * { visibility: hidden; }
-      #print-area, #print-area * { visibility: visible; }
-      #print-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        padding: 0;
-        margin: 0;
-        box-shadow: none !important;
-        border: none !important;
-      }
-      .no-print { display: none !important; }
+  /* =========================================================
+     PENGATURAN HALAMAN KHUSUS CETAK (A4 STANDARD MARGINS)
+     ========================================================= */
+  @page {
+    size: A4 portrait;
+    margin: 15mm 20mm 15mm 20mm; /* Margin Standar Dokumen Resmi */
+  }
+
+  @media print {
+    /* 1. Sembunyikan seluruh UI luar (Header, Sidebar, Form, Modal) */
+    header, 
+    aside, 
+    section.no-print, 
+    .no-print, 
+    #api-key-modal {
+      display: none !important;
     }
 
-    /* Penataan Gaya Dokumen Hasil */
-    .doc-preview h1 { font-size: 1.5rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.25rem; }
-    .doc-preview h2 { font-size: 1.25rem; font-weight: 600; margin-top: 0.85rem; margin-bottom: 0.5rem; color: #334155; }
-    .doc-preview h3 { font-size: 1.1rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.25rem; color: #475569; }
-    .doc-preview p { margin-bottom: 0.5rem; line-height: 1.6; color: #334155; }
-    .doc-preview ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.5rem; }
-    .doc-preview ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.5rem; }
-    .doc-preview table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; margin-bottom: 0.75rem; font-size: 0.9rem; }
-    .doc-preview th, .doc-preview td { border: 1px solid #cbd5e1; padding: 0.5rem; text-align: left; }
-    .doc-preview th { background-color: #f8fafc; font-weight: 600; }
-  </style>
+    /* 2. Reset tata letak induk agar memenuhi kertas A4 */
+    html, body, main, section, #print-area {
+      background: #ffffff !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: auto !important;
+      box-shadow: none !important;
+      border: none !important;
+      overflow: visible !important;
+      float: none !important;
+    }
+
+    #print-area {
+      display: block !important;
+      position: static !important;
+    }
+
+    /* 3. Mencegah judul / tabel terpotong di tengah halaman */
+    .doc-preview table, 
+    .doc-preview tr, 
+    #signature-block {
+      page-break-inside: avoid;
+    }
+
+    .doc-preview h1, 
+    .doc-preview h2, 
+    .doc-preview h3 {
+      page-break-after: avoid;
+    }
+  }
+
+  /* =========================================================
+     TAMPILAN DOKUMEN DI LAYAR (PREVIEW)
+     ========================================================= */
+  .doc-preview h1 { font-size: 1.4rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #0f172a; border-bottom: 2px solid #94a3b8; padding-bottom: 0.25rem; text-transform: uppercase; }
+  .doc-preview h2 { font-size: 1.2rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #1e293b; text-transform: uppercase; }
+  .doc-preview h3 { font-size: 1.05rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.35rem; color: #334155; }
+  .doc-preview h4 { font-size: 0.95rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.25rem; color: #475569; }
+  .doc-preview p { margin-bottom: 0.5rem; line-height: 1.6; color: #1e293b; font-size: 0.95rem; text-align: justify; }
+  .doc-preview ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.75rem; font-size: 0.95rem; }
+  .doc-preview ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.75rem; font-size: 0.95rem; }
+  .doc-preview hr { border: 0; border-top: 1px solid #cbd5e1; margin: 1rem 0; }
+
+  /* Styling Tabel Otomatis Rapi */
+  .doc-preview table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; margin-bottom: 1rem; font-size: 0.9rem; }
+  .doc-preview th, .doc-preview td { border: 1px solid #64748b; padding: 0.5rem 0.75rem; text-align: left; vertical-align: top; }
+  .doc-preview th { background-color: #f1f5f9; font-weight: 700; color: #0f172a; }
+  .doc-preview tr:nth-child(even) { background-color: #f8fafc; }
+</style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
@@ -488,7 +514,8 @@ PETUNJUK FORMAT HALAMAN:
 1. Awali dengan KOP DOKUMEN formal di bagian atas dalam bentuk tabel sederhana atau list identitas.
 2. Buatkan komponen isi dokumen secara mendalam (Tujuan Pembelajaran, Pemahaman Bermakna, Pertanyaan Pemantik, Kegiatan Pembelajaran Awal-Inti-Penutup, dan Asesmen).
 3. Gunakan format Markdown rapi (Gunakan # untuk judul utama, ## untuk sub judul, tabel | | untuk tabel kegiatan/rubrik, dan bullet point).
-4. Jangan tambahkan kolom tanda tangan di teks AI karena sudah ada di template sistem.
+4. DILARANG menggunakan format Matematika LaTeX seperti $\\frac{3}{4}$ atau $100.000$. Gunakan penulisan angka dan pecahan biasa seperti "3/4" atau "100.000" agar mudah dibaca siswa.
+5. Jangan tambahkan kolom tanda tangan di teks AI karena sudah ada di template sistem.
       `;
 
       try {
